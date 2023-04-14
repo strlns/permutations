@@ -1,0 +1,31 @@
+td {
+  padding: 0.75ex;
+  border-bottom: 0.5px solid #eee;
+}
+
+th {
+  padding: 1.5rem;
+  padding-left: 0;
+  text-align: left;
+  border-bottom: 1px solid #aaa;
+  white-space: nowrap;
+  /*max-width: 16ch;
+  width: max-content;*/
+}
+
+th:first-child,
+td:first-child {
+  text-align: center;
+  padding: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+}
+
+th:first-child,
+td:first-child {
+  border-right: 2px solid #aaa;
+}
+th:nth-child(2),
+td:nth-child(2) {
+  padding-left: 1ex;
+}
