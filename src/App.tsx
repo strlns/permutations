@@ -5,8 +5,14 @@ import {
   LoadingOverlay,
   createStyles,
 } from "@mantine/core";
-import { useDidUpdate, useElementSize, useLocalStorage } from "@mantine/hooks";
-import { shuffle } from "lodash-es";
+import {
+  useDidUpdate,
+  useElementSize,
+  useForceUpdate,
+  useLocalStorage,
+  useMediaQuery,
+} from "@mantine/hooks";
+import { omit, shuffle } from "lodash-es";
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import {
   Permutation,
@@ -44,7 +50,7 @@ export type Action =
   | { type: "setRandomize"; payload: boolean }
   | { type: "setLoading"; payload: boolean }
   | { type: "setNumberOfNames"; payload: number }
-  | { type: "reset"; payload?: Permutation }
+  | { type: "reset"; payload?: Permutation[] }
   | {
       type: "setResult";
       payload: {
@@ -69,20 +75,28 @@ const reducer = (state: AppState, action: Action): AppState => {
       return { ...state, randomize: action.payload };
     case "setLoading":
       return { ...state, loading: action.payload };
-    case "setNumberOfNames":
-      return reducer(
-        {
-          ...state,
-          numberOfNamesToShow: action.payload,
-        },
-        { type: "reset" }
-      );
-    case "reset":
-      return {
+    case "setNumberOfNames": {
+      const newState = {
         ...state,
-        permutations: action.payload ? [action.payload] : [],
-        done: false,
+        numberOfNamesToShow: action.payload,
       };
+      return reducer(newState, {
+        type: "reset",
+      });
+    }
+    case "reset": {
+      const newState = action.payload
+        ? {
+            ...state,
+            permutations: action.payload,
+            done: false,
+          }
+        : {
+            ...state,
+            done: false,
+          };
+      return newState;
+    }
     case "setResult":
       return {
         ...state,
@@ -115,6 +129,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function App() {
+  const isMobile = useMediaQuery("(max-width: 480px");
+
   const [state, dispatch] = useReducer(reducer, {
     loading: true,
   });
@@ -123,7 +139,6 @@ function App() {
 
   useDidUpdate(() => {
     if (!state.loading && hasProcessedInitialState.current) {
-      permutator.current = new Permutator(state);
       reset();
     }
   }, [state.names, state.loading, state.numberOfNamesToShow]);
@@ -193,8 +208,9 @@ function App() {
 
   const reset = useCallback(() => {
     if (state.loading || !hasProcessedInitialState.current) return;
-    permutator.current = new Permutator(state);
-    const payload = permutator.current.permutations?.[0];
+
+    permutator.current = new Permutator(omit(state, "permutations"));
+    const payload = permutator.current.permutations;
     dispatch({ type: "reset", payload });
   }, [state]);
 
@@ -237,7 +253,10 @@ function App() {
             {state.done ? (
               <p>Abgeschlossen</p>
             ) : (
-              <p>Klicken Sie rechts, um fortzufahren</p>
+              <p>
+                Klicken Sie {isMobile ? "auf die Buttons" : "rechts"}, um
+                fortzufahren
+              </p>
             )}
           </hgroup>
           <Group>

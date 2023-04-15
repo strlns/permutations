@@ -1,3 +1,7 @@
+table {
+  overflow: auto;
+}
+
 td {
   padding: 0.75ex;
   border-bottom: 0.5px solid #eee;
@@ -9,8 +13,6 @@ th {
   text-align: left;
   border-bottom: 1px solid #aaa;
   white-space: nowrap;
-  /*max-width: 16ch;
-  width: max-content;*/
 }
 
 th:first-child,

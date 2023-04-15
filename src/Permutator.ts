@@ -17,6 +17,7 @@ type PermutatorOptions = {
   numberOfNamesToShow?: number;
   randomize?: boolean;
   backtracking?: boolean;
+  permutations?: Permutation[];
 };
 
 type SerializedPermutation = {
@@ -48,6 +49,7 @@ export class Permutator {
       randomize = true,
       backtracking = false,
       numberOfNamesToShow,
+      permutations,
     }: PermutatorOptions = {
       names: [],
     }
@@ -58,13 +60,13 @@ export class Permutator {
     this.numberOfNamesToUse = numberOfNamesToShow ?? this.names.length;
     this.names = this.names.slice(0, this.numberOfNamesToUse);
     this.seats = this.names.map((_, index) => index + 1);
-    this.permutations = this.initialPermutations();
+    this.permutations = permutations ?? this.initialPermutations();
     this.previousSeatsByName = new Map();
     for (const name of this.names) {
-      this.previousSeatsByName.set(
-        name,
-        new Set([this.permutations[0].p.get(name)!.seat])
-      );
+      const seats = this.permutations.length
+        ? [this.permutations[0].p.get(name)!.seat]
+        : [];
+      this.previousSeatsByName.set(name, new Set(seats));
     }
     if (this.names.length === 0) {
       this.done = true;
@@ -81,27 +83,33 @@ export class Permutator {
       },
     ];
   }
-  static fromState(state: SerializedState) {
-    const isValid = state.permutations.every(
-      (permutaiton) => permutaiton.p.length === state.numberOfNamesToShow
-    );
-    if (!isValid) {
-      throw new Error("localStorage state is invalid.");
+  async ensureFirstRow() {
+    if (!this.permutations.length && this.names.length) {
+      this.permutations = this.initialPermutations();
     }
-
-    //Set up an instance from localStorage state.
-    const instance = new Permutator(state);
-    instance.permutations = state.permutations.map((permutation) =>
-      unserializePermutation(permutation, state.names)
-    );
-    for (const permutation of instance.permutations) {
-      for (const p of permutation.p) {
-        instance.previousSeatsByName.get(p[0])?.add(p[1].seat);
-      }
-    }
-    instance.done = state.done;
-    return instance;
+    return Promise.resolve();
   }
+  // static fromState(state: SerializedState) {
+  //   const isValid = state.permutations.every(
+  //     (permutaiton) => permutaiton.p.length === state.numberOfNamesToShow
+  //   );
+  //   if (!isValid) {
+  //     throw new Error("localStorage state is invalid.");
+  //   }
+
+  //   //Set up an instance from localStorage state.
+  //   const instance = new Permutator(state);
+  //   instance.permutations = state.permutations.map((permutation) =>
+  //     unserializePermutation(permutation, state.names)
+  //   );
+  //   for (const permutation of instance.permutations) {
+  //     for (const p of permutation.p) {
+  //       instance.previousSeatsByName.get(p[0])?.add(p[1].seat);
+  //     }
+  //   }
+  //   instance.done = state.done;
+  //   return instance;
+  // }
 
   next(randomize?: boolean, useBacktracking?: boolean) {
     const random = randomize ?? this.defaultRandomize;

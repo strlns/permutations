@@ -14,25 +14,38 @@ import { useDisclosure } from "@mantine/hooks";
 import { Dispatch, useMemo } from "react";
 import { Permutation } from "./Permutator";
 
-import { Action } from "./App";
+import { Action, MAX_NAMES } from "./App";
 import "./Permutations.css";
 
 const useStyles = createStyles((theme) => ({
   tableWrap: {
     overflow: "auto",
     maxWidth: "100%",
+    maxHeight: "75vh",
+    position: "relative",
+  },
+  tableHead: {
+    position: "sticky",
+    top: 0,
+    backgroundColor: "#fff",
   },
   container: {
     flexGrow: 1,
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
+    width: "100%",
   },
   sliderBox: {
     flexGrow: 1,
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-end",
+  },
+  slider: {
+    maxWidth: "80vw",
+    width: "calc(100% - 1.75rem)",
+    margin: "0 auto",
   },
 }));
 
@@ -121,7 +134,7 @@ export default function Permutations({
       <Divider />
       <Box className={classes.tableWrap}>
         <table width="100%">
-          <thead>
+          <thead className={classes.tableHead}>
             <tr>
               <th style={{ fontWeight: "normal" }}>Tag</th>
               {names.map((name) => (
@@ -198,13 +211,16 @@ export default function Permutations({
         <h3>Anzahl Namen: {numberOfNamesToShow}</h3>
         <p>Achtung, das Bewegen des Reglers setzt auch die Liste zurück.</p>
         <Slider
-          ml="md"
-          min={Math.min(3, originalNames.length)}
-          max={originalNames.length}
+          min={Math.min(3, names.length)}
+          max={MAX_NAMES}
           value={numberOfNamesToShow}
           onChange={(payload) =>
             dispatch({ type: "setNumberOfNames", payload })
           }
+          onChangeEnd={(payload) =>
+            dispatch({ type: "setNumberOfNames", payload })
+          }
+          className={classes.slider}
         />
         <Button variant="subtle" mt="sm" onClick={getNewNames}>
           Ich mag die Namen nicht.

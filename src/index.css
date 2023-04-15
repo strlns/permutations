@@ -1,18 +1,21 @@
 :root {
   height: calc(100% - 1rem);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
 }
 
 body {
   min-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body,
 #root {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 #root {
@@ -20,6 +23,7 @@ body,
   margin: 0 auto;
   height: 100%;
   flex-grow: 1;
+  overflow: hidden;
 }
 
 @media (min-width: 800px) {
