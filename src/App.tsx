@@ -8,7 +8,6 @@ import {
 import {
   useDidUpdate,
   useElementSize,
-  useForceUpdate,
   useLocalStorage,
   useMediaQuery,
 } from "@mantine/hooks";
@@ -126,6 +125,19 @@ const useStyles = createStyles((theme) => ({
     borderTop: "0.5px solid #eee",
     boxShadow: theme.shadows.xl,
   },
+  topBar: {
+    fontSize: "0.75rem",
+    backgroundColor: "rgba(255 255 255 / 0.5)",
+    borderBottom: "0.5px solid #eee",
+    boxShadow: theme.shadows.xl,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    userSelect: "none",
+    width: "100%",
+    position: "absolute",
+    inset: 0,
+    bottom: "auto",
+  },
 }));
 
 function App() {
@@ -191,7 +203,7 @@ function App() {
         permutations: permutator.current.permutations,
       },
     });
-  }, [state]);
+  }, [state, state.randomize, state.backtracking]);
 
   const finish = useCallback(() => {
     while (!permutator.current.done) {
@@ -212,7 +224,7 @@ function App() {
     permutator.current = new Permutator(omit(state, "permutations"));
     const payload = permutator.current.permutations;
     dispatch({ type: "reset", payload });
-  }, [state]);
+  }, [state, state.numberOfNamesToShow, state.names]);
 
   const getNewNames = useCallback(
     () =>
@@ -236,6 +248,10 @@ function App() {
         visible={Boolean(state.loading)}
         loaderProps={{ size: "xl" }}
       />
+      <Group className={classes.topBar} pr="sm" py="sm">
+        <a href="https://github.com/strlns/permutations">GitHub</a>
+        <a href="https://moritzrehbach.de">2023 MR</a>
+      </Group>
       <Affix w="100%" py="sm" className={classes.affixBottom} ref={affixRef}>
         <Group
           px="md"

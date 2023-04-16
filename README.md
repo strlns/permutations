@@ -32,15 +32,21 @@ Aber wir wollten ja "zufällige" Sitzordnungen. Wie man sich intuitiv
 schon denken kann, ist es immer möglich, **n** Sitzordnungen für
 **n** Plätze zu finden, die das Kriterium erfüllen.
 
-Aber was passiert, wenn man "ungünstig" umsetzt?
+Dabei erhält man ein [Lateinisches Quadrat](https://de.wikiedia.org/wiki/Lateinisches_Quadrat).
 
-Wie man leicht sieht, landet man dann bei weniger Möglichkeiten.
+Was passiert, wenn man "ungünstig" umsetzt?
 
-Diese App war ein Spaß, um nach einem Gespräch mit einem Freund
-die "Sackgassen" zu zeigen, und wie man das Problem löst,
-ohne alle Möglichkeiten durchprobieren zu müssen (trotzdem per Brute force, also
-mit Backtracking).
+Wie man leicht sieht, landet man dann bei weniger Möglichkeiten / Sitzordnungen.
 
-Aktuell im Web auf
+Diese App wurde aus Neugier und zum Zeitvertreib programmiert nach einem Gespräch mit einem Freund
+darüber, wie viele solche Sitzordnungen existieren.
+
+Man kann hier die "Sackgassen" in zufälligen Permutationen sowie die rotierende Permutation ausprobieren,
+und man kann beliebige zufällige Lateinische Quadrate generieren mit Backtracking.
+
+Die Folge der Anzahl aller möglichen Lateinischen Quadrate in
+Abhängigkeit von **n** findet sich im OEIS als [https://oeis.org/A002860](A002860)
+und es ist keine einfache Formel zur Berechnung dieser Anzahl für
+beliebig große **n** bekannt.
 
 https://paperclip-factory.de/permutations

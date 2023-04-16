@@ -21,13 +21,22 @@ const useStyles = createStyles((theme) => ({
   tableWrap: {
     overflow: "auto",
     maxWidth: "100%",
-    maxHeight: "75vh",
+    maxHeight: "70vh",
+    "@media: (min-width: 480px)": {
+      maxHeight: "800px",
+    },
     position: "relative",
   },
   tableHead: {
-    position: "sticky",
-    top: 0,
-    backgroundColor: "#fff",
+    "& th": {
+      boxShadow: theme.shadows.sm,
+      position: "sticky",
+      top: 0,
+      backgroundColor: "#fff",
+      padding: "1.125rem",
+      paddingLeft: 0,
+      textAlign: "left",
+    },
   },
   container: {
     flexGrow: 1,
@@ -84,7 +93,7 @@ export default function Permutations({
   const { classes } = useStyles();
 
   return (
-    <Container className={classes.container} pb={pb}>
+    <Container className={classes.container} pb={pb} pt="lg">
       <h1>Sitzordnungen / Quadrate</h1>
       <p>
         Angenommen, es gibt genau so viele Plätze wie Kursteilnehmer: wie viele
@@ -100,16 +109,6 @@ export default function Permutations({
           erhalten, ist natürlich, die Plätze einfach zu rotieren.
           <br /> Dann gibt es genau so viele Sitzordnungen wie Plätze.
         </p>
-        <p>
-          Aber wir wollten ja "zufällige" Sitzordnungen. Wie man sich intuitiv
-          schon denken kann, ist es immer möglich, <em>n</em> Sitzordnungen für{" "}
-          <em>n</em> Plätze zu finden, die das Kriterium erfüllen.
-        </p>
-        <p>
-          Aber was passiert, wenn man "ungünstig" umsetzt?
-          <br />
-          Wie man leicht sieht, landet man dann bei weniger Möglichkeiten.
-        </p>
         <p>Die zwei Kriterien sind ja:</p>
         <ul>
           <li>Platz noch nie vorher von diesem Schüler besetzt</li>
@@ -117,18 +116,32 @@ export default function Permutations({
         </ul>
         <p>
           Notiert man das als Tabelle, entspricht es den Regeln, dass sich ein
-          Sitzplatz weder in einer Zeile, noch in einer Spalte wiederholen darf,
-          ein klassisches Rätsel zum Zeitvertreib ähnlich dem magischen Quadrat.
+          Sitzplatz weder in einer Zeile, noch in einer Spalte wiederholen darf:
+          ein{" "}
+          <a href="https://de.wikiedia.org/wiki/Lateinisches_Quadrat">
+            Lateinisches Quadrat
+          </a>
+        </p>
+        <p>Aber was passiert, wenn man "ungünstig" umsetzt?</p>
+        <p>Dann gibt es weniger mögliche verbleibende Sitzordnungen.</p>
+        <p>
+          <small>
+            Die Folge der Anzahl aller möglichen Lateinischen Quadrate in
+            Abhängigkeit von <em>n</em>
+            findet sich im OEIS als{" "}
+            <a href="https://oeis.org/A002860">A002860</a>
+            und es ist keine einfache Formel zur Berechnung dieser Anzahl für
+            beliebig große <em>n</em> bekannt.
+          </small>
         </p>
         <p>
           Der leichteste Weg, das Problem algorithmisch zu lösen, ist{" "}
           <a href="https://de.wikipedia.org/wiki/Backtracking">Backtracking</a>.
         </p>
         <p>
-          Fast spannender als diese Lösung sind die "Sackgassen" – dazu einfach
-          unten den zweiten Schalter deaktivieren, das geht auch in der Mitte
-          eines Lösungswegs. Mit zufällig generierten Permutationen landet man
-          schnell in Sackgassen, etwa wenn bei 4 Plätzen jeweils 2 ver
+          Mit zufällig generierten Permutationen landet man schnell in
+          Sackgassen (Beispiel: 4 Plätze, von denen man im ersten Schritt gleich
+          jeweils 2 vertauscht).
         </p>
       </Collapse>
       <Divider />

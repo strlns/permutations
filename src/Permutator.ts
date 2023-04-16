@@ -64,7 +64,11 @@ export class Permutator {
     this.previousSeatsByName = new Map();
     for (const name of this.names) {
       const seats = this.permutations.length
-        ? [this.permutations[0].p.get(name)!.seat]
+        ? Array.prototype.concat.call(
+            this.permutations
+              .map((perm) => perm.p.get(name)?.seat)
+              .filter(Boolean)
+          )
         : [];
       this.previousSeatsByName.set(name, new Set(seats));
     }
@@ -120,12 +124,22 @@ export class Permutator {
     //It is convenient for UI here to use a map instead of an array.
     const permutation: Permutation = { p: new Map(), complete: false };
     const backtrackedNames = new Set();
+    const previous = this.permutations.at(-1);
     while (names.length > 0) {
       const name = names.pop()!;
-      const seat = this.seats.find(
+      let seat = this.seats.find(
         (seat) =>
           !(this.previousSeatsByName.get(name)?.has(seat) || occupied.has(seat))
       );
+      if (!random && previous) {
+        const prevSeat = previous.p.get(name)?.seat;
+        if (prevSeat) {
+          const nextSeat = (prevSeat % this.seats.length) + 1;
+          if (!occupied.has(nextSeat)) {
+            seat = nextSeat;
+          }
+        }
+      }
       if (seat) {
         permutation.p.set(name, { name, seat });
         occupied.add(seat);
@@ -158,8 +172,8 @@ export class Permutator {
         continue;
       }
     }
-    this.permutations.push(permutation);
     if (permutation.p.size === this.numberOfNamesToUse) {
+      this.permutations.push(permutation);
       for (const [name, { seat }] of permutation.p.entries()) {
         this.previousSeatsByName.get(name)!.add(seat);
       }
@@ -169,6 +183,7 @@ export class Permutator {
         return;
       }
     } else {
+      this.permutations.push(permutation);
       //Incomplete permutation: we are at a dead end. Algo is finished.
       this.done = true;
     }
