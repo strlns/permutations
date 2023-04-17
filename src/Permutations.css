@@ -12,12 +12,9 @@ th {
   border-bottom: 1px solid #aaa;
 }
 
-th:first-child,
 td:first-child {
   text-align: center;
   padding: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 2.5px;
 }
 
 th:first-child,

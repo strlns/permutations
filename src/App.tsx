@@ -1,16 +1,5 @@
-import {
-  Affix,
-  Button,
-  Group,
-  LoadingOverlay,
-  createStyles,
-} from "@mantine/core";
-import {
-  useDidUpdate,
-  useElementSize,
-  useLocalStorage,
-  useMediaQuery,
-} from "@mantine/hooks";
+import { Group, LoadingOverlay, createStyles } from "@mantine/core";
+import { useDidUpdate, useElementSize, useLocalStorage } from "@mantine/hooks";
 import { omit, shuffle } from "lodash-es";
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import {
@@ -22,6 +11,7 @@ import {
 } from "./Permutator";
 
 import Permutations from "./Permutations";
+import BottomBar from "./components/BottomBar";
 import allNames from "./exampleNames.json";
 
 type State = {
@@ -31,6 +21,7 @@ type State = {
   randomize: boolean;
   backtracking: boolean;
   done: boolean;
+  seatNumbers: number[];
 };
 
 type AppState =
@@ -106,25 +97,25 @@ const reducer = (state: AppState, action: Action): AppState => {
       return {
         ...state,
         names: action.payload,
+        seatNumbers: action.payload.map((_, index) => index + 1),
       };
   }
   return state;
 };
 
+const defaultNames = shuffle(allNames).slice(MAX_NAMES);
+
 const defaultState = {
   permutations: [] as Permutation[],
   backtracking: true,
   done: false,
-  names: shuffle(allNames).slice(MAX_NAMES),
+  names: defaultNames,
+  seatNumbers: defaultNames.map((_, index) => index + 1),
   numberOfNamesToShow: 3,
   randomize: true,
 };
+
 const useStyles = createStyles((theme) => ({
-  affixBottom: {
-    backgroundColor: "#fff",
-    borderTop: "0.5px solid #eee",
-    boxShadow: theme.shadows.xl,
-  },
   topBar: {
     fontSize: "0.75rem",
     backgroundColor: "rgba(255 255 255 / 0.5)",
@@ -141,8 +132,6 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function App() {
-  const isMobile = useMediaQuery("(max-width: 480px");
-
   const [state, dispatch] = useReducer(reducer, {
     loading: true,
   });
@@ -252,55 +241,32 @@ function App() {
         <a href="https://github.com/strlns/permutations">GitHub</a>
         <a href="https://moritzrehbach.de">2023 MR</a>
       </Group>
-      <Affix w="100%" py="sm" className={classes.affixBottom} ref={affixRef}>
-        <Group
-          px="md"
-          style={{ justifyContent: "space-between", userSelect: "none" }}
-        >
-          <hgroup>
-            <h2 style={{ minHeight: "1.25em" }}>
-              {!state.loading && numberOfPermutations > 0 && (
-                <>
-                  {numberOfPermutations} Anordnung
-                  {numberOfPermutations > 1 && "en"}
-                </>
-              )}
-            </h2>
-            {state.done ? (
-              <p>Abgeschlossen</p>
-            ) : (
-              <p>
-                Klicken Sie {isMobile ? "auf die Buttons" : "rechts"}, um
-                fortzufahren
-              </p>
-            )}
-          </hgroup>
-          <Group>
-            <Button onClick={next} disabled={state.done}>
-              {state.randomize ? "Nächste Zeile" : "Weiterrücken"}
-            </Button>
-            <Button onClick={() => reset()} variant="outline">
-              Zeilen zurücksetzen
-            </Button>
-            <Button onClick={finish} disabled={state.done}>
-              {"Alle generieren"}
-            </Button>
-          </Group>
-        </Group>
-      </Affix>
-      {!state.loading && (
-        <Permutations
-          getNewNames={getNewNames}
-          pb={`${Math.min(affixHeight, 200) + 40}px`}
-          reset={reset}
-          dispatch={dispatch}
-          permutations={state.permutations}
-          backtracking={state.backtracking}
-          done={state.done}
-          names={state.names}
-          numberOfNamesToShow={state.numberOfNamesToShow}
-          randomize={state.randomize}
-        />
+      {state.loading || (
+        <>
+          <Permutations
+            getNewNames={getNewNames}
+            pb={`${Math.min(affixHeight, 200) + 40}px`}
+            reset={reset}
+            dispatch={dispatch}
+            permutations={state.permutations}
+            backtracking={state.backtracking}
+            done={state.done}
+            names={state.names}
+            seatNumbers={state.seatNumbers}
+            numberOfNamesToShow={state.numberOfNamesToShow}
+            randomize={state.randomize}
+          />
+          <BottomBar
+            done={state.done}
+            isBacktracking={state.backtracking}
+            isRandomize={state.randomize}
+            finish={finish}
+            next={next}
+            reset={reset}
+            numberOfPermutations={numberOfPermutations}
+            ref={affixRef}
+          />
+        </>
       )}
     </>
   );

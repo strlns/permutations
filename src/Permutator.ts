@@ -9,6 +9,7 @@ type SeatedStudent = {
 //It is convenient for UI here to use a map instead of an array.
 export type Permutation = {
   p: Map<string, SeatedStudent>;
+  pFlipped: Map<number, SeatedStudent>;
   complete: boolean;
 };
 
@@ -27,6 +28,7 @@ type SerializedPermutation = {
 
 export type SerializedState = {
   permutations: SerializedPermutation[];
+  seatNumbers: number[];
   names: string[];
   backtracking: boolean;
   randomize: boolean;
@@ -83,15 +85,15 @@ export class Permutator {
         p: new Map(
           this.names.map((name, index) => [name, { name, seat: seats[index] }])
         ),
+        pFlipped: new Map(
+          this.names.map((name, index) => [
+            seats[index],
+            { name, seat: seats[index] },
+          ])
+        ),
         complete: true,
       },
     ];
-  }
-  async ensureFirstRow() {
-    if (!this.permutations.length && this.names.length) {
-      this.permutations = this.initialPermutations();
-    }
-    return Promise.resolve();
   }
   // static fromState(state: SerializedState) {
   //   const isValid = state.permutations.every(
@@ -114,7 +116,6 @@ export class Permutator {
   //   instance.done = state.done;
   //   return instance;
   // }
-
   next(randomize?: boolean, useBacktracking?: boolean) {
     const random = randomize ?? this.defaultRandomize;
     const backtracking = useBacktracking ?? this.backtracking;
@@ -122,7 +123,11 @@ export class Permutator {
     const occupied = new Set();
     //Maps in JS are ordered.
     //It is convenient for UI here to use a map instead of an array.
-    const permutation: Permutation = { p: new Map(), complete: false };
+    const permutation: Permutation = {
+      p: new Map(),
+      pFlipped: new Map(),
+      complete: false,
+    };
     const backtrackedNames = new Set();
     const previous = this.permutations.at(-1);
     while (names.length > 0) {
@@ -142,6 +147,7 @@ export class Permutator {
       }
       if (seat) {
         permutation.p.set(name, { name, seat });
+        permutation.pFlipped.set(seat, { name, seat });
         occupied.add(seat);
       } else if (backtracking) {
         //undo last insertion and postpone it until the end.
@@ -198,6 +204,9 @@ export const unserializePermutation = (
     complete,
     p: new Map(
       p.map((seat, index) => [names[index], { name: names[index], seat }])
+    ),
+    pFlipped: new Map(
+      p.map((seat, index) => [seat, { name: names[index], seat }])
     ),
   };
 };
