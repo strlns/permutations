@@ -107,7 +107,7 @@ export default function Permutations({
           <thead className={classes.tableHead}>
             <tr>
               <SplitTableHeaderCell
-                labelTopRight="Name"
+                labelTopRight={flipXY ? "Sitzplatz" : "Name"}
                 labelBottomLeft="Tag"
               />
               {flipXY
